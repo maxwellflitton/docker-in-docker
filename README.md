@@ -43,4 +43,7 @@ docker exec -it rust-dind docker info --format \
 ```
 # inside your existing Dockerfile that already has Docker CE
 RUN apt-get update && apt-get install -y fuse-overlayfs && rm -rf /var/lib/apt/lists/*
+
+-e IPTABLES=/usr/sbin/iptables-legacy \
+apt-get install -y fuse-overlayfs iptables-legacy
 ```

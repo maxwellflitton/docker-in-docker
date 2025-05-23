@@ -38,3 +38,9 @@ inside we check the docker binding with the following:
 docker exec -it rust-dind docker info --format \
   'Driver={{.Driver}}, Data-root={{.DockerRootDir}}'
 ```
+
+
+```
+# inside your existing Dockerfile that already has Docker CE
+RUN apt-get update && apt-get install -y fuse-overlayfs && rm -rf /var/lib/apt/lists/*
+```

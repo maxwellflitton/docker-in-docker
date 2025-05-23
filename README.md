@@ -47,3 +47,16 @@ RUN apt-get update && apt-get install -y fuse-overlayfs && rm -rf /var/lib/apt/l
 -e IPTABLES=/usr/sbin/iptables-legacy \
 apt-get install -y fuse-overlayfs iptables-legacy
 ```
+
+
+```
+# Dockerfile only installs the CLI, not the daemon
+FROM rust:1.78-bookworm
+RUN apt-get update && apt-get install -y docker-ce-cli fuse-overlayfs
+
+# run it
+docker run --rm -it \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  myrust-dockercli bash
+
+```

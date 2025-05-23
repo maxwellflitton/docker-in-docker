@@ -18,6 +18,12 @@ docker run -d --privileged \
   -v dind-data:/var/lib/docker \        # inner daemon’s data
   -e DOCKER_DRIVER=overlay2 \           # tell dockerd to use overlay2
   rust-dind                             # ← the image you built
+
+docker run -d --privileged \
+  --name rust-dind-test \
+  -v dind-data:/var/lib/docker \
+  -e DOCKER_DRIVER=overlay2 \
+  rust-dind
 ```
 
 we run it below:

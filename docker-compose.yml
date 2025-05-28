@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:latest     # pin a tag if you prefer
+    ports:
+      - "4566:4566"           # Edge/Gateway port – all services
+      - "4510-4559:4510-4559" # (optional) individual service ports
+    environment:
+      # which emulated AWS services to start
+      - SERVICES=s3
+      # default region for the emulation
+      - DEFAULT_REGION=us-east-1
+      # useful during setup/debugging
+      - DEBUG=1
+

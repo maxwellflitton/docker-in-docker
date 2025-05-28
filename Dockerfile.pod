@@ -32,4 +32,12 @@ WORKDIR /workspace
 
 ENV PODMAN_LOG_LEVEL=error
 
-ENTRYPOINT ["/bin/bash","-lc","podman load -q -i /opt/images/localstack.tar && podman system service -t 0 & exec bash"]
+COPY test-doc .
+COPY run_test.sh . 
+
+# ENV PATH=/usr/local/cargo/bin:/usr/local/rustup/bin:$PATH
+
+# ENTRYPOINT ["/bin/bash","-lc","podman system service -t 0 & exec bash"]
+
+# ENTRYPOINT ["/bin/bash","-lc","podman system service -t 0 & exec bash run_test.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "podman system service -t 0 & exec bash run_test.sh"]

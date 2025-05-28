@@ -1,0 +1,11 @@
+[package]
+name = "test-doc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.45.1", features = ["full"]}
+aws-config  = { version = "1.5.0", features = ["behavior-version-latest"] }
+aws-sdk-s3  = "1.17.0"                # the async AWS S3 client
+uuid        = { version = "1.8", features = ["v4"] }
+aws-credential-types = "1.2.3"

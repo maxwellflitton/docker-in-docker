@@ -60,3 +60,41 @@ docker run --rm -it \
   myrust-dockercli bash
 
 ```
+
+
+# for the podman
+
+```
+docker build -f Dockerfile.pod -t rust-bookworm-podman .
+```
+
+```
+docker run --privileged \
+           --device /dev/fuse \
+           -e _CONTAINERS_USERNS_CONFIGURED=1 \
+           -v podman_lib:/var/lib/containers \
+           -it rust-bookworm-podman
+```
+
+# Remember to prune the docker image volume
+
+```
+docker system prune -af --volumes
+```
+
+```
+docker builder prune -af
+```
+
+```
+docker run --privileged \
+       --name rust-tests \
+       -v rust_podman_storage:/var/lib/containers \
+       -it rust-bookworm-podman
+```
+
+inside the container we run the following to run it in the background:
+
+```
+podman system service -t 0 &
+```

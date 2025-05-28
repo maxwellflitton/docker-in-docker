@@ -1,46 +1,17 @@
-# ###############################################################################
-# # Stage 0 – get a recent static Podman build (≈15 MiB)
-# ###############################################################################
-# FROM quay.io/podman/stable:latest AS podman_src
-# # — or pin a version —
-# # FROM quay.io/podman/stable:v5.5 AS podman_src
-# # Everything we need lives in /usr/bin plus /etc/containers/*
+###############################################################################
+# Stage 0 – download LocalStack image without Docker/Podman
+###############################################################################
+FROM quay.io/skopeo/stable:v1               AS fetch_localstack
 
-# ###############################################################################
-# # Stage 1 – final Rust image on Debian 12 (“bookworm”)
-# ###############################################################################
-# FROM rust:bookworm
-
-# # 1 Runtime helpers for *rootless* Podman
-# RUN apt-get update && \
-#     DEBIAN_FRONTEND=noninteractive \
-#     apt-get install -y --no-install-recommends \
-#         uidmap slirp4netns fuse-overlayfs iptables && \
-#     apt-get clean && rm -rf /var/lib/apt/lists/* \
-#                       /usr/share/doc/* /usr/share/man/*
-
-# # 2 Copy the Podman CLI from stage 0  (make sure stage 0 exists above!)
-# COPY --from=podman_src /usr/bin/podman /usr/bin/podman
-
-# # 3 Create user + XDG runtime dir **while still root**
-# RUN useradd -ms /bin/bash dev && \
-#     echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-#     mkdir -p /run/user/1000 && \
-#     chown -R dev:dev /run/user/1000
-
-# ENV XDG_RUNTIME_DIR=/run/user/1000
-# USER dev
-
-# WORKDIR /workspace
-
-# # ─────────────────────────────────────────────────────────────────────────────
-# # 4. When the container starts:
-# #    • launch a *daemon* (API socket) that never times out  (-t 0)
-# #    • then drop into a shell so CI scripts / humans can run commands
-# # ─────────────────────────────────────────────────────────────────────────────
-# ENTRYPOINT ["/bin/bash", "-lc", "podman system service -t 0 & exec bash"]
+# Copy LocalStack image from Docker Hub to a local OCI archive tarball
+RUN skopeo copy --insecure-policy \
+      docker://docker.io/localstack/localstack:latest \
+      oci-archive:/tmp/localstack.tar:latest
 
 FROM rust:bookworm
+
+# Add the pre-fetched LocalStack tarball
+COPY --from=fetch_localstack /tmp/localstack.tar /opt/images/localstack.tar
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
@@ -61,4 +32,4 @@ WORKDIR /workspace
 
 ENV PODMAN_LOG_LEVEL=error
 
-ENTRYPOINT ["/bin/bash","-lc","podman system service -t 0 & exec bash"]
+ENTRYPOINT ["/bin/bash","-lc","podman load -q -i /opt/images/localstack.tar && podman system service -t 0 & exec bash"]

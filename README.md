@@ -98,3 +98,9 @@ inside the container we run the following to run it in the background:
 ```
 podman system service -t 0 &
 ```
+
+We can load the image with the following:
+
+```
+podman run -d --name localstack -p 4566:4566 localhost/latest:latest
+```
